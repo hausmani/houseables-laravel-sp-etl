@@ -9,9 +9,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     git \
     libxml2-dev \
-    libpq-dev \ # Required for PostgreSQL
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_pgsql zip
+    libpq-dev && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd pdo pdo_pgsql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
