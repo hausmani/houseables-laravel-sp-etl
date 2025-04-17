@@ -1,0 +1,47 @@
+version: 0.2
+
+env:
+  variables:
+    TestVar: "123"
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub...
+      - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 556412116536.dkr.ecr.us-west-2.amazonaws.com
+      - DOCKER_REGISTRY=556412116536.dkr.ecr.us-west-2.amazonaws.com/
+      - REPOSITORY_URI="$DOCKER_REGISTRY"spreporting
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo $CONTAINER_REPOSITORY_URL
+      - echo $TAG_NAME
+      - docker pull $REPOSITORY_URI:latest || true
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - aws ssm get-parameters-by-path --path /SELLINGPARTNERETL/production --region us-west-2 |  jq -r '.Parameters | map(.Name+"="+.Value)| join("\n") | sub("/SELLINGPARTNERETL/production/"; ""; "g")  ' > .env
+      - echo "PHP_PORT=80" >> .env
+      - docker build --cache-from $REPOSITORY_URI:latest --tag $REPOSITORY_URI:latest -f docker/php/Dockerfile .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - rm docker-compose.yml
+      - mv codebuild.docker-compose.yml docker-compose.yml
+artifacts:
+  files:
+    - '.ebextensions/**/*'
+    - '.platform/**/*'
+    - 'conf/**/*'
+    - 'python/**/*'
+    - 'docker/**/*'
+    - 'dconnect.sh'
+    - 'docker-compose.yml'
+

@@ -1,0 +1,49 @@
+name: Build and Push SP API Laravel ETL to AWS ECR
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build-and-push:
+    name: Build and Push to SP API Laravel ETL ECR
+    runs-on: ubuntu-latest
+    env:
+      ECR_REPOSITORY: sp-api-laravel-etl  # Define the repository name here
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Automatic Tagging of Releases
+        id: increment-git-tag
+        run: |
+          bash ./build/git_update.sh -v major
+
+      - name: Create .ENV
+        id: create-env
+        run: |
+          aws ssm get-parameters-by-path --path /SPAPIETL --region us-east-1 |  jq -r '.Parameters | map(.Name+"="+.Value)| join("\n") | sub("/SPAPIETL/"; ""; "g")  ' > .env
+          sed -i 's/^LOG_CHANNEL=.*/LOG_CHANNEL=stdout/' .env
+          sed -i 's/^APP_DEBUG=.*/APP_DEBUG=true/' .env
+          aws s3 cp s3://houseables-credentials/bq-credentials-ads.json bq-credentials-sp.json
+          chmod 644 bq-credentials-sp.json
+
+      - name: Build, Tag, and Push the Image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
+        run: |
+          docker build --cache-from $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest --tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest

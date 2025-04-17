@@ -1,0 +1,13 @@
+apps:
+  - name: sellingpartner-seller-report-download-s3
+    script: ./artisan
+    cwd: /var/app/current
+    exec_mode: fork
+    interpreter: php
+    instances: 7
+    kill_timeout: 3600000
+    out_file: /var/log/sp-etl/sellingpartner-seller-report-download-s3.log
+    args:
+      - queue:work
+      - --queue=sellingpartner-seller-report-download-s3
+      - --timeout=86400

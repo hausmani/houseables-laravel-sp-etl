@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  web:
+    container_name: spreporting
+    image: 556412116536.dkr.ecr.us-west-2.amazonaws.com/spreporting:latest
+    restart: always
+    ports:
+      - "80:80"
+    tty: true
+    stdin_open: true
+    volumes:
+      - "${EB_LOG_BASE_DIR}/web:/var/log/apache2/"
+      - "/var/log/nginx/healthd:/var/log/apache2/healthd"
+    extra_hosts:
+      - "dockerhost:127.0.0.1"

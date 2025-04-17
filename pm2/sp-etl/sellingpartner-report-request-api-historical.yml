@@ -1,0 +1,13 @@
+apps:
+  - name: sellingpartner-report-request-api-historical
+    script: ./artisan
+    cwd: /var/app/current
+    exec_mode: fork
+    interpreter: php
+    instances: 5
+    kill_timeout: 3600000
+    out_file: /var/log/sp-etl/sellingpartner-report-request-api-historical.log
+    args:
+      - queue:work
+      - --queue=sellingpartner-report-request-api-historical
+      - --timeout=86400

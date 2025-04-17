@@ -1,0 +1,14 @@
+apps:
+  - name: sellingpartner-dispatch-order-buyerinfo-load-bq
+    script: ./artisan
+    cwd: /var/app/current
+    exec_mode: fork
+    interpreter: php
+    instances: 1
+    kill_timeout: 3600000
+    out_file: /var/log/sp-etl/sellingpartner-dispatch-order-buyerinfo-load-bq.log
+    args:
+      - queue:listen
+      - sqs-json
+      - --queue=sellingpartner-dispatch-order-buyerinfo-load-bq
+      - --timeout=86400

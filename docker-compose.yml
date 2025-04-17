@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+    web:
+        container_name: sp-api-laravel-etl
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        volumes:
+            - ./:/var/www/html
+        env_file:
+            - ./.env
+        tty: true
+        stdin_open: true
+        extra_hosts:
+            - "dockerhost:127.0.0.1"

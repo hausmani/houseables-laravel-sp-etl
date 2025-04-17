@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  web:
+    container_name: sp-api-etl-laravel
+    build:
+      context: .
+      dockerfile: ./Dockerfile.local
+    restart: always
+    volumes:
+      - ./:/app
+    env_file:
+      - ./.env
+    ports:
+      - "80:8080"
+    tty: true
+    stdin_open: true
+    extra_hosts:
+      - "dockerhost:127.0.0.1"

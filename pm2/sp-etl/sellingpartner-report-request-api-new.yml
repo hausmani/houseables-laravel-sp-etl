@@ -1,0 +1,13 @@
+apps:
+  - name: sellingpartner-report-request-api-new
+    script: ./artisan
+    cwd: /var/app/current
+    exec_mode: fork
+    interpreter: php
+    instances: 10
+    kill_timeout: 3600000
+    out_file: /var/log/sp-etl/sellingpartner-report-request-api-new.log
+    args:
+      - queue:work
+      - --queue=sellingpartner-report-request-api-new
+      - --timeout=86400
