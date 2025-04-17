@@ -1,5 +1,5 @@
-# Use a PHP base image with FPM
-FROM php:8.2-fpm
+# Use a PHP 8.3 base image
+FROM php:8.3-fpm
 
 # Install necessary dependencies and PHP extensions (including zip and pdo_pgsql)
 RUN apt-get update && apt-get install -y \
@@ -10,8 +10,9 @@ RUN apt-get update && apt-get install -y \
     git \
     libxml2-dev \
     libpq-dev \
-    libzip-dev && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_pgsql zip
+    libzip-dev && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd pdo pdo_pgsql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
