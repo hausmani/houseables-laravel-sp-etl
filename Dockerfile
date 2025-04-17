@@ -1,7 +1,7 @@
-# Use a PHP 8.2 base image instead of 8.1
+# Use a PHP base image with FPM
 FROM php:8.2-fpm
 
-# Install required dependencies
+# Install necessary dependencies and PHP extensions (including zip)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -10,21 +10,21 @@ RUN apt-get update && apt-get install -y \
     git \
     libxml2-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql
+    && docker-php-ext-install gd pdo pdo_mysql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /var/www/html
 
-# Copy application files into the container
+# Copy the current directory content into the container
 COPY . .
 
-# Run Composer install to install dependencies
+# Run composer install to install dependencies
 RUN composer install
 
-# Expose port for PHP-FPM
+# Expose the port
 EXPOSE 9000
 
 # Start PHP-FPM
