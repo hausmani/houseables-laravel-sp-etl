@@ -1,7 +1,7 @@
 # Use a PHP base image with FPM
 FROM php:8.2-fpm
 
-# Install necessary dependencies and PHP extensions (including zip)
+# Install necessary dependencies and PHP extensions (including zip and pdo_pgsql)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -9,8 +9,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     git \
     libxml2-dev \
+    libpq-dev \ # Required for PostgreSQL
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip
+    && docker-php-ext-install gd pdo pdo_pgsql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
