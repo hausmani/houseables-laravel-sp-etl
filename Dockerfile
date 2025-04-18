@@ -1,33 +1,11 @@
-# Use a PHP 8.3 base image
-FROM php:8.3-fpm
+# Used for prod build.
+FROM jkaninda/laravel-php-fpm:8.3
 
-# Install necessary dependencies and PHP extensions (including zip and pdo_pgsql)
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
-    git \
-    libxml2-dev \
-    libpq-dev \
-    libzip-dev && \
-    docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install gd pdo pdo_pgsql zip
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set the working directory inside the container
 WORKDIR /var/www/html
 
-# Copy the current directory content into the container
-COPY . .
-
-# Run composer install to install dependencies
+COPY . /var/www/html
 RUN composer install
 
-# Expose the port
-EXPOSE 9000
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Start PHP-FPM
-CMD ["php-fpm"]
