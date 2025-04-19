@@ -12,9 +12,7 @@ class PushEnvToSSMCommand extends Command
         {--prefix= : SSM Prefix}
         {--env_file= : .env file name (e.g., .env.prod)}
     ';
-
     protected $description = 'Push environment variables to AWS SSM Parameter Store';
-
     public function __construct()
     {
         parent::__construct();
