@@ -32,11 +32,13 @@ class ListInventoryJob extends Job
         $this->maxResults = 200;
 
         $this->onQueue(Q_AWD_LIST_INVENTORY);
-        $this->switchToTestQueueIfTestServer();
+//        $this->onConnection('sqs');
+//        $this->switchToTestQueueIfTestServer();
     }
 
     public function handle()
     {
+//        dd("{$this->connection} is the connection");
         $amazonAPIClient = SpApiHelper::getAWDApiClient($this->profile_info['profile_id'], $this->profile_info['client_authorisation_id'], $this->profile_info['marketplaceId']);
         if ($amazonAPIClient === false) {
             Log::info('List AWD Inventory Job stopped here due to error in refresh token. for profile [' . $this->profile_info['profile_id'] . ']');

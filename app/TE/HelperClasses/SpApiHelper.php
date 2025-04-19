@@ -14,8 +14,8 @@ class SpApiHelper
     {
 
         return SellingPartnerApi::seller(
-            env('LWA_APP_ID'),
-            env('LWA_CLIENT_SECRET'),
+            config('services.selling_partner.lwa_app_id'),
+            config('services.selling_partner.lwa_client_secret'),
             $refresh_token,
             self::getByMarketplaceId($marketplaceId)
         );

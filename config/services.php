@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'selling_partner' => [
+        'lwa_app_id' => env('LWA_APP_ID'),
+        'lwa_client_secret' => env('LWA_CLIENT_SECRET'),
+    ],
+
+
 ];

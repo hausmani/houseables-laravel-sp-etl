@@ -2,11 +2,19 @@
 
 namespace App\Jobs\DataCollection;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
 class DispatchJobsJob
 {
+    use Dispatchable, Queueable;
+
+    public function __construct()
+    {
+        $this->onQueue(Q_DISPATCH_JOB);
+    }
 
     public function handle(array $data)
     {

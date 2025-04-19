@@ -83,19 +83,18 @@ class ListInventoryCommand extends Command
                     'retry_attempts' => 1
                 ];
 
-                $job = new ListInventoryJob($profile_info);
+//                config(['queue.default' => 'sqs']);
+                dispatch(new ListInventoryJob($profile_info));
 
-                if (!empty($queue_name)) {
-                    $job->onQueue($queue_name);
-                }
+//                if (!empty($queue_name)) {
+//                    $job->onQueue($queue_name);
+//                }
 
-                $job->switchToTestQueueIfTestServer();
+//                if (!empty($conn)) {
+//                    $job->onConnection($conn);
+//                }
 
-                if (!empty($conn)) {
-                    $job->onConnection($conn);
-                }
-
-                dispatch($job);
+//                dispatch($job);
 
             }
         }
