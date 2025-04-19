@@ -3,6 +3,7 @@
 namespace App\Jobs\DataCollection;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\Job as LaravelJob;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +17,7 @@ class DispatchJobsJob
         $this->onQueue(Q_DISPATCH_JOB);
     }
 
-    public function handle(array $data)
+    public function handle(LaravelJob $job, ?array $data)
     {
 
         $command = $data['command'] ?? '';
